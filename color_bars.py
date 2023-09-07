@@ -35,12 +35,7 @@ video_presets = {
     'n': {'width': 720, 'height': 480, 'fps': 29.97},  # NTSC
 }
 
-# Set the default preset to PAL
 current_preset = 'p'
-
-# Create a PAL video window without a border and without the OpenCV status bar
-cv2.namedWindow('EBU Color Bars', cv2.WND_PROP_FULLSCREEN | cv2.WINDOW_GUI_NORMAL)
-cv2.setWindowProperty('EBU Color Bars', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 # Function to update the video resolution and frame rate based on the selected preset
 def update_video_params(preset):
@@ -49,6 +44,24 @@ def update_video_params(preset):
     height = video_presets[preset]['height']
     fps = video_presets[preset]['fps']
     cv2.resizeWindow('EBU Color Bars', width, height)
+
+# Function to toggle fullscreen mode
+def toggle_fullscreen():
+    global is_fullscreen
+    if is_fullscreen:
+        cv2.setWindowProperty('EBU Color Bars', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
+    else:
+        cv2.setWindowProperty('EBU Color Bars', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    is_fullscreen = not is_fullscreen
+
+# Function to change the video preset and update parameters
+def change_preset(preset_key):
+    if preset_key in video_presets:
+        current_preset = preset_key
+        update_video_params(current_preset)
+
+cv2.namedWindow('EBU Color Bars', cv2.WND_PROP_FULLSCREEN | cv2.WINDOW_GUI_NORMAL)
+cv2.setWindowProperty('EBU Color Bars', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 # Initialize video parameters
 update_video_params(current_preset)
@@ -97,29 +110,12 @@ audio = pyaudio.PyAudio()
 # Open a stereo audio stream
 audio_stream = audio.open(
     format=pyaudio.paInt16,
-    channels=2,  # Two channels for stereo
+    channels=2,
     rate=audio_sample_rate,
     output=True
 )
 
-# Track the fullscreen state
 is_fullscreen = True
-
-# Function to toggle fullscreen mode
-def toggle_fullscreen():
-    global is_fullscreen
-    if is_fullscreen:
-        cv2.setWindowProperty('EBU Color Bars', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
-    else:
-        cv2.setWindowProperty('EBU Color Bars', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-    is_fullscreen = not is_fullscreen
-
-# Function to change the video preset and update parameters
-def change_preset(preset_key):
-    global current_preset
-    if preset_key in video_presets:
-        current_preset = preset_key
-        update_video_params(current_preset)
 
 # Play the stereo audio and display the pattern until the window is closed
 while True:
